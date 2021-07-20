@@ -32,6 +32,11 @@
                 </cc:log>
                 <cc:cloud-log id="CloudLog" level="info" message="Hellooolllllll @{lp.getSimpleData('name')}" message-details="Hello  @{ lp.getSimpleData('name') } congratulations on running your first Workday Cloud Integration." output-file-type="HTML"/>
                 <cc:store id="Store" output="variable" output-variable="store.blob" input="variable" input-variable="cloud-log-content" createDocumentReference="true" summary="Hello cloud-log" title="Hello.html"/>
+                <cc:log id="Log">
+                    <cc:log-message>
+                        <cc:message-content/>
+                    </cc:log-message>
+                </cc:log>
             </cc:steps>
             <cc:send-error id="SendError" routes-to="PutIntegrationMessage"/>
         </cc:async-mediation>
