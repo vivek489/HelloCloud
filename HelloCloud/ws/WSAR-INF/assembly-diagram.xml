@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wdnm:Diagram xmlns:wdnm="http://workday.com/studio/editors/notation">
+  <element href="assembly.xml#WorkdayAssembly"/>
+  <visualProperties x="118" y="140">
+    <element href="assembly.xml#StartHere"/>
+  </visualProperties>
+  <visualProperties x="703" y="140">
+    <element href="assembly.xml#SayHelloToWorkday"/>
+  </visualProperties>
+  <visualProperties x="398" y="124">
+    <element href="assembly.xml#LogHello"/>
+  </visualProperties>
+  <decorations x="215" y="248" width="581" height="494" font="Arial|10|0" fontColor="1" type="TEXT" text="Every Studio integration begins with a workday-in transport. This one's ID is StartHere. It has a single launch parameter called name, which has the default value Test.&#xD;&#xA;&#xD;&#xA;Every assembly records runtime errors, events, and other messages in a log file. To view the log file for an integration, right-click the relevant process in the Process Monitor view and select View Log File. &#xD;&#xA;&#xD;&#xA;The WriteToLogs log step in the LogHello async-mediation writes a line to the HelloCloud log file. As you can see on the Message Builder tab of its Properties view, the line it writes is the text 'Hello', followed by the value of the workday-in's launch parameter, name. You should use the log output with care as large amounts of information placed there can degrade the performance of the integration and lead to truncation of the log. As an alternative, you should use the CloudLog step to store structured information in an easily readable fashion in the cloud-log. In this example, the store step is used to add this log to the Integration Event.&#xD;&#xA;&#xD;&#xA;Workday Studio provides a range of prepackaged subassemblies that you can use to build your integrations. These subassemblies are available from the Common Components tab of the Palette. When you add one to your assembly diagram, Studio inserts a local-out element in the XML source with the appropriate endpoint in Workday. In this example, the subassembly called SayHelloToWorkday is of the type PutIntegrationMessage. It adds a message to the integration event. You can see how the message is created on the Parameters tab of the component's Properties view.&#xD;&#xA;&#xD;&#xA;When deployed, the workday-in is realized in the Workday tenant as an Integration System. This allows you to configure the Workday Studio integration, for example, to set up notifications or scheduling. &#xD;&#xA;&#xD;&#xA;After deploying and launching the integration, examine the Messages tab for the Integation Event in Workday."/>
+  <connections type="routesTo" sourceAnchorX="0.926605504587156" sourceAnchorY="0.40540540540540543" targetAnchorX="0.0" targetAnchorY="0.4787234042553192">
+    <source href="assembly.xml#StartHere"/>
+    <target href="assembly.xml#LogHello"/>
+  </connections>
+  <connections type="routesTo" sourceAnchorX="0.8409090909090909" sourceAnchorY="0.4782608695652174" targetAnchorX="0.13855421686746988" targetAnchorY="0.4864864864864865">
+    <source href="assembly.xml#LogHello"/>
+    <target href="assembly.xml#SayHelloToWorkday"/>
+  </connections>
+  <swimlanes x="215" y="96" font="Arial|12|1" bgColor="16777215" fgColor="12632256" fontColor="1" name="Hello Cloud" alignment="MIDDLE">
+    <elements href="assembly.xml#StartHere"/>
+    <elements href="assembly.xml#LogHello"/>
+    <elements href="assembly.xml#SayHelloToWorkday"/>
+  </swimlanes>
+</wdnm:Diagram>

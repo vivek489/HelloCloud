@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+     xmlns="http://www.springframework.org/schema/beans"
+     xmlns:beans="http://www.springframework.org/schema/beans"
+     xmlns:cc="http://www.capeclear.com/assembly/10"
+     xmlns:cloud="urn:com.workday/esb/cloud/10.0"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ 
+	<cc:assembly id="WorkdayAssembly" version="2018.14">
+	<cc:workday-in id="StartHere" routes-to="LogHello">
+<cc:integration-system name="Integration System Hello">
+        <cloud:param name="name">
+          <cloud:type>
+            <cloud:simple-type>text</cloud:simple-type>
+          </cloud:type>
+          <cloud:default>
+            <cloud:text>Test</cloud:text>
+          </cloud:default>
+        </cloud:param>
+      </cc:integration-system>
+</cc:workday-in>
+<cc:local-out id="SayHelloToWorkday" endpoint="vm://wcc/PutIntegrationMessage">
+<cc:set name="is.message.severity" value="'INFO'"/>
+<cc:set name="is.message.summary" value="'Hello ' + lp.getSimpleData('name') + ' !'"/>
+<cc:set name="is.message.detail" value="'Hello ' + lp.getSimpleData('name') + ', congratulations on running your first Workday Cloud Integration.' "/>
+<cc:set name="is.document.variable.name" value="'store.blob'"/></cc:local-out>
+        <cc:async-mediation id="LogHello" routes-to="SayHelloToWorkday">
+            <cc:steps>
+                <cc:log id="WriteToLogs">
+                    <cc:log-message>
+<cc:text>Hellooolllllll @{lp.getSimpleData('name')}</cc:text></cc:log-message>
+                </cc:log>
+                <cc:cloud-log id="CloudLog" level="info" message="Hellooolllllll @{lp.getSimpleData('name')}" message-details="Hello  @{ lp.getSimpleData('name') } congratulations on running your first Workday Cloud Integration." output-file-type="HTML"/>
+                <cc:store id="Store" output="variable" output-variable="store.blob" input="variable" input-variable="cloud-log-content" createDocumentReference="true" summary="Hello cloud-log" title="Hello.html"/>
+            </cc:steps>
+        </cc:async-mediation>
+</cc:assembly>
+
+</beans>
