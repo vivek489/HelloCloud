@@ -7,7 +7,7 @@
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
  
 	<cc:assembly id="WorkdayAssembly" version="2018.14">
-	<cc:workday-in id="StartHere" routes-to="GetEventDocuments">
+	<cc:workday-in id="StartHere" routes-to="GetEventDocumentss">
 <cc:integration-system name="INT6216 FINSYS IT Account Receivable Esker Customer Open AR PDF Outbound Delivery">
         <cloud:param name="lp.ie.event.wid">
           <cloud:type>
@@ -47,7 +47,7 @@ filename : @{lp.getSimpleData('filename')}</cc:text></cc:log-message>
             <cc:send-error id="SendError" routes-to="PutIntegrationMessage"/>
         </cc:async-mediation>
         <cc:local-out id="PutIntegrationMessage" endpoint="vm://wcc/PutIntegrationMessage"><cc:set name="is.message.severity" value="'INFO'"/><cc:set name="is.message.summary"/></cc:local-out>
-        <cc:local-out id="GetEventDocuments" routes-response-to="GetFile" endpoint="vm://wcc/GetEventDocuments"><cc:set name="ie.event.wid" value="lp.getSimpleData('lp.ie.event.wid')"/></cc:local-out>
+        <cc:local-out id="GetEventDocumentss" routes-response-to="GetFile" endpoint="vm://wcc/GetEventDocuments"><cc:set name="ie.event.wid" value="lp.getSimpleData('lp.ie.event.wid')"/></cc:local-out>
         <cc:splitter id="Splitter">
             <cc:sub-route name="SubRoute" routes-to="AsyncMediation"/>
             <cc:unzip-splitter format="zip"/>
