@@ -7,9 +7,9 @@
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
  
 	<cc:assembly id="WorkdayAssembly" version="2018.14">
-	<cc:workday-in id="StartHere" routes-to="LogHello">
-<cc:integration-system name="Integration System Hello">
-        <cloud:param name="name">
+	<cc:workday-in id="StartHere" routes-to="GetEventDocuments">
+<cc:integration-system name="INT6216 FINSYS IT Account Receivable Esker Customer Open AR PDF Outbound Delivery">
+        <cloud:param name="lp.ie.event.wid">
           <cloud:type>
             <cloud:simple-type>text</cloud:simple-type>
           </cloud:type>
@@ -17,31 +17,55 @@
             <cloud:text>Test</cloud:text>
           </cloud:default>
         </cloud:param>
+        <cloud:param name="filename">
+          <cloud:type>
+            <cloud:simple-type>text</cloud:simple-type>
+          </cloud:type>
+          <cloud:default>
+            <cloud:text>file1.csv</cloud:text>
+          </cloud:default>
+        </cloud:param>
       </cc:integration-system>
 </cc:workday-in>
 <cc:local-out id="SayHelloToWorkday" endpoint="vm://wcc/PutIntegrationMessage">
 <cc:set name="is.message.severity" value="'INFO'"/>
-<cc:set name="is.message.summary" value="'Hello ' + lp.getSimpleData('name') + ' !'"/>
-<cc:set name="is.message.detail" value="'Hello ' + lp.getSimpleData('name') + ', congratulations on running your first Workday Cloud Integration.' "/>
+<cc:set name="is.message.summary" value="'lp.ie.event.wid -' + lp.getSimpleData('lp.ie.event.wid') + ' - filename : ' + lp.getSimpleData('filename')"/>
+<cc:set name="is.message.detail" value="'lp.ie.event.wid -' + lp.getSimpleData('lp.ie.event.wid') + ' - filename : ' + lp.getSimpleData('filename')"/>
 <cc:set name="is.document.variable.name" value="'store.blob'"/></cc:local-out>
-        <cc:async-mediation id="LogHello" routes-to="SayHelloToWorkday">
+        <cc:async-mediation id="GetFile" routes-to="CallSubRoutine">
             <cc:steps>
+                <cc:eval id="Eval">
+                    <cc:expression>da.toVar(lp.getSimpleData('filename'), 'varFileName')</cc:expression>
+                </cc:eval>
                 <cc:log id="WriteToLogs">
                     <cc:log-message>
-<cc:text>Hellooolllllll @{lp.getSimpleData('name')}</cc:text></cc:log-message>
+<cc:text>lp.ie.event.wid : @{lp.getSimpleData('lp.ie.event.wid')}&#xD;
+filename : @{lp.getSimpleData('filename')}</cc:text></cc:log-message>
                 </cc:log>
-                <cc:copy id="Copy"/>
-                <cc:cloud-log id="CloudLog" level="info" message="Hellooolllllll @{lp.getSimpleData('name')}" message-details="Hello  @{ lp.getSimpleData('name') } congratulations on running your first Workday Cloud Integration." output-file-type="HTML"/>
-                <cc:store id="Store" output="variable" output-variable="store.blob" input="variable" input-variable="cloud-log-content" createDocumentReference="true" summary="Hello cloud-log" title="Hello.html"/>
-                <cc:log id="Log">
-                    <cc:log-message>
-                        <cc:message-content/>
-                    </cc:log-message>
-                </cc:log>
+                <cc:copy id="Copy" output-mimetype="application/zip" input="variable" input-variable="varFileName"/>
             </cc:steps>
             <cc:send-error id="SendError" routes-to="PutIntegrationMessage"/>
         </cc:async-mediation>
         <cc:local-out id="PutIntegrationMessage" endpoint="vm://wcc/PutIntegrationMessage"><cc:set name="is.message.severity" value="'INFO'"/><cc:set name="is.message.summary"/></cc:local-out>
+        <cc:local-out id="GetEventDocuments" routes-response-to="GetFile" endpoint="vm://wcc/GetEventDocuments"><cc:set name="ie.event.wid" value="lp.getSimpleData('lp.ie.event.wid')"/></cc:local-out>
+        <cc:splitter id="Splitter">
+            <cc:sub-route name="SubRoute" routes-to="AsyncMediation"/>
+            <cc:unzip-splitter format="zip"/>
+        </cc:splitter>
+        <cc:async-mediation id="AsyncMediation" routes-to="PutIntegrationMessage0">
+            <cc:steps>
+                <cc:copy id="Copy" output="variable" output-variable="filename"/>
+                <cc:store id="Store" output="variable" output-variable="store.blob" collection="P90D" createDocumentReference="false" title="@{vars['filename'].fileName}"/>
+            </cc:steps>
+        </cc:async-mediation>
+        <cc:async-mediation id="AsyncMediation0" routes-to="SayHelloToWorkday">
+            <cc:steps>
+                <cc:cloud-log id="CloudLog" level="info" message="lp.ie.event.wid -   @{lp.getSimpleData('lp.ie.event.wid')} - filename : @{lp.getSimpleData('filename')}" message-details="lp.ie.event.wid -   @{lp.getSimpleData('lp.ie.event.wid')} - filename : @{lp.getSimpleData('filename')}" output-file-type="HTML"/>
+                <cc:store id="Store" output="variable" output-variable="store.blob" input="variable" input-variable="cloud-log-content" createDocumentReference="true" summary="Hello cloud-log" title="Hello.html"/></cc:steps>
+        </cc:async-mediation>
+        <cc:local-in id="SubRoutine" routes-to="Splitter"/>
+        <cc:local-out id="CallSubRoutine" store-message="none" routes-response-to="AsyncMediation0" endpoint="vm://INT6216_FINSYS_IT_Customer_Open_AR_PDF_Delivery2/SubRoutine"/>
+        <cc:local-out id="PutIntegrationMessage0" endpoint="vm://wcc/PutIntegrationMessage"><cc:set name="is.message.severity" value="'INFO'"/><cc:set name="is.message.summary" value="'Unzipped file name: ' + vars['filename'].fileName + 'Successfully'"/><cc:set name="is.document.variable.name" value="'store.blob'"/></cc:local-out>
 </cc:assembly>
 
 </beans>
